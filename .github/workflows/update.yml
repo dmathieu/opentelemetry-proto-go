@@ -1,0 +1,19 @@
+name: Update
+on: [push]
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./scripts/proto.sh
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      - name: Commit and Push
+        run: |
+          git config --global user.email "otel-spam@dmathieu.com"; \
+          git config --global user.name "OpenTelemetry Proto Go Robot"; \
+          git add .; \
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update proto"; \
+          git push --set-upstream origin "HEAD:${{ steps.extract_branch.outputs.branch }}"
