@@ -11,7 +11,9 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -30,10 +32,7 @@ type MetricConfigRequest struct {
 	Resource *v1.Resource `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 	// Optional. The value of MetricConfigResponse.fingerprint for the last
 	// configuration that the caller received and successfully applied.
-	LastKnownFingerprint []byte   `protobuf:"bytes,2,opt,name=last_known_fingerprint,json=lastKnownFingerprint,proto3" json:"last_known_fingerprint,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	LastKnownFingerprint []byte `protobuf:"bytes,2,opt,name=last_known_fingerprint,json=lastKnownFingerprint,proto3" json:"last_known_fingerprint,omitempty"`
 }
 
 func (m *MetricConfigRequest) Reset()         { *m = MetricConfigRequest{} }
@@ -43,16 +42,25 @@ func (*MetricConfigRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_fd5f5955cb59f8ef, []int{0}
 }
 func (m *MetricConfigRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MetricConfigRequest.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *MetricConfigRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MetricConfigRequest.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_MetricConfigRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *MetricConfigRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MetricConfigRequest.Merge(m, src)
 }
 func (m *MetricConfigRequest) XXX_Size() int {
-	return xxx_messageInfo_MetricConfigRequest.Size(m)
+	return m.Size()
 }
 func (m *MetricConfigRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_MetricConfigRequest.DiscardUnknown(m)
@@ -99,10 +107,7 @@ type MetricConfigResponse struct {
 	Schedules []*MetricConfigResponse_Schedule `protobuf:"bytes,2,rep,name=schedules,proto3" json:"schedules,omitempty"`
 	// Optional. The client is suggested to wait this long (in seconds) before
 	// pinging the configuration service again.
-	SuggestedWaitTimeSec int32    `protobuf:"varint,3,opt,name=suggested_wait_time_sec,json=suggestedWaitTimeSec,proto3" json:"suggested_wait_time_sec,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	SuggestedWaitTimeSec int32 `protobuf:"varint,3,opt,name=suggested_wait_time_sec,json=suggestedWaitTimeSec,proto3" json:"suggested_wait_time_sec,omitempty"`
 }
 
 func (m *MetricConfigResponse) Reset()         { *m = MetricConfigResponse{} }
@@ -112,16 +117,25 @@ func (*MetricConfigResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_fd5f5955cb59f8ef, []int{1}
 }
 func (m *MetricConfigResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MetricConfigResponse.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *MetricConfigResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MetricConfigResponse.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_MetricConfigResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *MetricConfigResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MetricConfigResponse.Merge(m, src)
 }
 func (m *MetricConfigResponse) XXX_Size() int {
-	return xxx_messageInfo_MetricConfigResponse.Size(m)
+	return m.Size()
 }
 func (m *MetricConfigResponse) XXX_DiscardUnknown() {
 	xxx_messageInfo_MetricConfigResponse.DiscardUnknown(m)
@@ -162,10 +176,7 @@ type MetricConfigResponse_Schedule struct {
 	InclusionPatterns []*MetricConfigResponse_Schedule_Pattern `protobuf:"bytes,2,rep,name=inclusion_patterns,json=inclusionPatterns,proto3" json:"inclusion_patterns,omitempty"`
 	// Describes the collection period for each metric in seconds.
 	// A period of 0 means to not export.
-	PeriodSec            int32    `protobuf:"varint,3,opt,name=period_sec,json=periodSec,proto3" json:"period_sec,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	PeriodSec int32 `protobuf:"varint,3,opt,name=period_sec,json=periodSec,proto3" json:"period_sec,omitempty"`
 }
 
 func (m *MetricConfigResponse_Schedule) Reset()         { *m = MetricConfigResponse_Schedule{} }
@@ -175,16 +186,25 @@ func (*MetricConfigResponse_Schedule) Descriptor() ([]byte, []int) {
 	return fileDescriptor_fd5f5955cb59f8ef, []int{1, 0}
 }
 func (m *MetricConfigResponse_Schedule) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MetricConfigResponse_Schedule.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *MetricConfigResponse_Schedule) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MetricConfigResponse_Schedule.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_MetricConfigResponse_Schedule.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *MetricConfigResponse_Schedule) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MetricConfigResponse_Schedule.Merge(m, src)
 }
 func (m *MetricConfigResponse_Schedule) XXX_Size() int {
-	return xxx_messageInfo_MetricConfigResponse_Schedule.Size(m)
+	return m.Size()
 }
 func (m *MetricConfigResponse_Schedule) XXX_DiscardUnknown() {
 	xxx_messageInfo_MetricConfigResponse_Schedule.DiscardUnknown(m)
@@ -220,10 +240,7 @@ type MetricConfigResponse_Schedule_Pattern struct {
 	// Types that are valid to be assigned to Match:
 	//	*MetricConfigResponse_Schedule_Pattern_Equals
 	//	*MetricConfigResponse_Schedule_Pattern_StartsWith
-	Match                isMetricConfigResponse_Schedule_Pattern_Match `protobuf_oneof:"match"`
-	XXX_NoUnkeyedLiteral struct{}                                      `json:"-"`
-	XXX_unrecognized     []byte                                        `json:"-"`
-	XXX_sizecache        int32                                         `json:"-"`
+	Match isMetricConfigResponse_Schedule_Pattern_Match `protobuf_oneof:"match"`
 }
 
 func (m *MetricConfigResponse_Schedule_Pattern) Reset()         { *m = MetricConfigResponse_Schedule_Pattern{} }
@@ -233,16 +250,25 @@ func (*MetricConfigResponse_Schedule_Pattern) Descriptor() ([]byte, []int) {
 	return fileDescriptor_fd5f5955cb59f8ef, []int{1, 0, 0}
 }
 func (m *MetricConfigResponse_Schedule_Pattern) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MetricConfigResponse_Schedule_Pattern.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *MetricConfigResponse_Schedule_Pattern) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MetricConfigResponse_Schedule_Pattern.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_MetricConfigResponse_Schedule_Pattern.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *MetricConfigResponse_Schedule_Pattern) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MetricConfigResponse_Schedule_Pattern.Merge(m, src)
 }
 func (m *MetricConfigResponse_Schedule_Pattern) XXX_Size() int {
-	return xxx_messageInfo_MetricConfigResponse_Schedule_Pattern.Size(m)
+	return m.Size()
 }
 func (m *MetricConfigResponse_Schedule_Pattern) XXX_DiscardUnknown() {
 	xxx_messageInfo_MetricConfigResponse_Schedule_Pattern.DiscardUnknown(m)
@@ -252,6 +278,8 @@ var xxx_messageInfo_MetricConfigResponse_Schedule_Pattern proto.InternalMessageI
 
 type isMetricConfigResponse_Schedule_Pattern_Match interface {
 	isMetricConfigResponse_Schedule_Pattern_Match()
+	MarshalTo([]byte) (int, error)
+	Size() int
 }
 
 type MetricConfigResponse_Schedule_Pattern_Equals struct {
@@ -307,39 +335,40 @@ func init() {
 }
 
 var fileDescriptor_fd5f5955cb59f8ef = []byte{
-	// 500 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x94, 0x4d, 0x6f, 0xd3, 0x4e,
-	0x10, 0xc6, 0xff, 0x9b, 0xfe, 0xfb, 0x92, 0x49, 0x25, 0xc4, 0x12, 0x81, 0x15, 0x09, 0x29, 0xf4,
-	0x14, 0x84, 0xba, 0x56, 0x03, 0x1c, 0x01, 0x29, 0xa8, 0x14, 0x09, 0xa1, 0x46, 0x0e, 0x52, 0x25,
-	0x2e, 0x96, 0xeb, 0x4c, 0xed, 0x15, 0xf6, 0xae, 0xeb, 0x1d, 0x27, 0xe5, 0xc2, 0x07, 0xe0, 0x84,
-	0xf8, 0x06, 0x7c, 0x26, 0xbe, 0x0d, 0x27, 0xe4, 0xb5, 0xe3, 0x3a, 0x22, 0x87, 0x8a, 0x97, 0xdb,
-	0xe6, 0x79, 0x66, 0x7e, 0xcf, 0x64, 0x6c, 0x2f, 0x1c, 0xeb, 0x0c, 0x15, 0x61, 0x82, 0x29, 0x52,
-	0xfe, 0xd1, 0xcd, 0x72, 0x4d, 0xda, 0x2d, 0xcf, 0x32, 0x34, 0x2e, 0x5e, 0x65, 0x98, 0xcb, 0x14,
-	0x15, 0x05, 0xc9, 0x4a, 0xf4, 0x43, 0xad, 0x2e, 0x64, 0xe4, 0x1b, 0xcc, 0x17, 0x32, 0x44, 0x61,
-	0x3b, 0xf8, 0x68, 0x0d, 0x53, 0x89, 0xa2, 0xee, 0x10, 0x6d, 0xcc, 0x40, 0x6c, 0x0a, 0xcc, 0xd1,
-	0xe8, 0x22, 0x0f, 0xd1, 0x5d, 0x1c, 0x35, 0xe7, 0x0a, 0x72, 0xf0, 0x95, 0xc1, 0x9d, 0xb7, 0x16,
-	0xf4, 0xd2, 0x06, 0x7b, 0x78, 0x59, 0xa0, 0x21, 0x7e, 0x0c, 0x7b, 0xab, 0x4a, 0x87, 0x0d, 0xd9,
-	0xa8, 0x37, 0x7e, 0x28, 0x36, 0x0d, 0xd1, 0xe0, 0x16, 0x47, 0xc2, 0xab, 0xcf, 0x5e, 0xd3, 0xca,
-	0x9f, 0xc0, 0xdd, 0x24, 0x30, 0xe4, 0x7f, 0x50, 0x7a, 0xa9, 0xfc, 0x0b, 0xa9, 0x22, 0xcc, 0xb3,
-	0x5c, 0x2a, 0x72, 0x3a, 0x43, 0x36, 0xda, 0xf7, 0xfa, 0xa5, 0xfb, 0xa6, 0x34, 0x5f, 0x5d, 0x7b,
-	0x07, 0xdf, 0xff, 0x87, 0xfe, 0xfa, 0x50, 0x26, 0xd3, 0xca, 0x20, 0x1f, 0x42, 0xaf, 0xcd, 0x60,
-	0x96, 0xd1, 0x96, 0x38, 0x42, 0xd7, 0x84, 0x31, 0xce, 0x8b, 0x04, 0x8d, 0xd3, 0x19, 0x6e, 0x8d,
-	0x7a, 0xe3, 0x13, 0x71, 0xd3, 0xed, 0x89, 0x4d, 0xa1, 0x62, 0x56, 0xf3, 0xbc, 0x6b, 0x32, 0x7f,
-	0x0a, 0xf7, 0x4c, 0x11, 0x45, 0x68, 0x08, 0xe7, 0xfe, 0x32, 0x90, 0xe4, 0x93, 0x4c, 0xd1, 0x37,
-	0x18, 0x3a, 0x5b, 0x43, 0x36, 0xda, 0xf6, 0xfa, 0x8d, 0x7d, 0x16, 0x48, 0x7a, 0x27, 0x53, 0x9c,
-	0x61, 0x38, 0xf8, 0xd1, 0x81, 0xbd, 0x15, 0x8e, 0x7f, 0x02, 0x8e, 0x57, 0x61, 0x52, 0x18, 0xa9,
-	0x95, 0x9f, 0x05, 0x44, 0x98, 0x2b, 0xe3, 0x30, 0x3b, 0xf3, 0xe9, 0x5f, 0x9a, 0x59, 0x4c, 0x2b,
-	0xae, 0x77, 0xbb, 0x89, 0xaa, 0x15, 0x53, 0xe6, 0x4b, 0xf5, 0x4b, 0x7e, 0xe7, 0x1f, 0xe5, 0x37,
-	0x51, 0x4d, 0xfe, 0x7d, 0x80, 0x12, 0xa3, 0xe7, 0xad, 0xb5, 0x75, 0x2b, 0xa5, 0xdc, 0xd5, 0x29,
-	0xec, 0xd6, 0xa5, 0xdc, 0x81, 0x1d, 0xbc, 0x2c, 0x82, 0xc4, 0xd8, 0x27, 0xde, 0x7d, 0xfd, 0x9f,
-	0x57, 0xff, 0xe6, 0x0f, 0xa0, 0x67, 0x28, 0xc8, 0xc9, 0xf8, 0x4b, 0x49, 0xb1, 0x7d, 0xa9, 0x4a,
-	0x1b, 0x2a, 0xf1, 0x4c, 0x52, 0x3c, 0xd9, 0x85, 0xed, 0x34, 0xa0, 0x30, 0x1e, 0x7f, 0x63, 0xb0,
-	0xdf, 0x1e, 0x96, 0x7f, 0x61, 0x70, 0xeb, 0x04, 0x69, 0x4d, 0x7b, 0xf6, 0xbb, 0x7f, 0xdc, 0x7e,
-	0x36, 0x83, 0xe7, 0x7f, 0xb6, 0xb7, 0xc9, 0x67, 0x06, 0x8f, 0xa4, 0xbe, 0x31, 0x64, 0xe2, 0xb4,
-	0x29, 0xb3, 0xea, 0xce, 0x98, 0x96, 0xe5, 0x53, 0xf6, 0xfe, 0x45, 0x24, 0x29, 0x2e, 0xce, 0x45,
-	0xa8, 0x53, 0x77, 0x9e, 0x06, 0x14, 0x4b, 0x2c, 0xdc, 0x35, 0xf2, 0xa1, 0x25, 0x1f, 0x46, 0x9b,
-	0xaf, 0xa4, 0xf3, 0x1d, 0x6b, 0x3f, 0xfe, 0x19, 0x00, 0x00, 0xff, 0xff, 0x0c, 0x10, 0x25, 0x76,
-	0xc5, 0x04, 0x00, 0x00,
+	// 527 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x94, 0xcb, 0x6e, 0xd3, 0x40,
+	0x14, 0x86, 0x33, 0x29, 0xbd, 0x4d, 0x2a, 0x21, 0x86, 0x08, 0xac, 0x48, 0x58, 0xa1, 0xab, 0x20,
+	0xd4, 0xb1, 0x1a, 0x60, 0x09, 0x48, 0x41, 0xa5, 0x48, 0x08, 0x35, 0x72, 0x90, 0x2a, 0xb1, 0xb1,
+	0x5c, 0xe7, 0xd4, 0x1e, 0x61, 0xcf, 0xb8, 0x9e, 0xe3, 0xa4, 0x6c, 0x78, 0x86, 0x8a, 0x37, 0x80,
+	0xa7, 0x61, 0x59, 0x89, 0x0d, 0x4b, 0x94, 0xbc, 0x05, 0x2b, 0xe4, 0x4b, 0x5c, 0x47, 0x64, 0x51,
+	0x71, 0xd9, 0x4d, 0xfe, 0xff, 0x9c, 0xef, 0x3f, 0x39, 0xb6, 0x87, 0x1e, 0xa8, 0x18, 0x24, 0x42,
+	0x08, 0x11, 0x60, 0xf2, 0xc1, 0x8a, 0x13, 0x85, 0xca, 0xca, 0xce, 0xc2, 0xd3, 0x16, 0x9c, 0xc7,
+	0x90, 0x88, 0x08, 0x24, 0xba, 0xe1, 0x42, 0x74, 0x3c, 0x25, 0x4f, 0x85, 0xef, 0x68, 0x48, 0x26,
+	0xc2, 0x03, 0x9e, 0x77, 0xb0, 0xde, 0x12, 0xa6, 0x10, 0x79, 0xd9, 0xc1, 0xeb, 0x98, 0x0e, 0x5f,
+	0x15, 0x98, 0x80, 0x56, 0x69, 0xe2, 0x81, 0x35, 0xd9, 0xaf, 0xce, 0x05, 0x64, 0xf7, 0x13, 0xa1,
+	0xb7, 0xdf, 0xe4, 0xa0, 0x17, 0x79, 0xb0, 0x0d, 0x67, 0x29, 0x68, 0x64, 0x07, 0x74, 0x6b, 0x51,
+	0x69, 0x90, 0x2e, 0xe9, 0xb5, 0xfa, 0x0f, 0xf8, 0xaa, 0x21, 0x2a, 0xdc, 0x64, 0x9f, 0xdb, 0xe5,
+	0xd9, 0xae, 0x5a, 0xd9, 0x63, 0x7a, 0x27, 0x74, 0x35, 0x3a, 0xef, 0xa5, 0x9a, 0x4a, 0xe7, 0x54,
+	0x48, 0x1f, 0x92, 0x38, 0x11, 0x12, 0x8d, 0x66, 0x97, 0xf4, 0x76, 0xec, 0x76, 0xe6, 0xbe, 0xce,
+	0xcc, 0x97, 0x57, 0xde, 0xee, 0xb7, 0x1b, 0xb4, 0xbd, 0x3c, 0x94, 0x8e, 0x95, 0xd4, 0xc0, 0xba,
+	0xb4, 0x55, 0x67, 0x90, 0x9c, 0x51, 0x97, 0x18, 0xd0, 0x6d, 0xed, 0x05, 0x30, 0x4e, 0x43, 0xd0,
+	0x46, 0xb3, 0xbb, 0xd6, 0x6b, 0xf5, 0x0f, 0xf9, 0x75, 0xb7, 0xc7, 0x57, 0x85, 0xf2, 0x51, 0xc9,
+	0xb3, 0xaf, 0xc8, 0xec, 0x09, 0xbd, 0xab, 0x53, 0xdf, 0x07, 0x8d, 0x30, 0x76, 0xa6, 0xae, 0x40,
+	0x07, 0x45, 0x04, 0x8e, 0x06, 0xcf, 0x58, 0xeb, 0x92, 0xde, 0xba, 0xdd, 0xae, 0xec, 0x63, 0x57,
+	0xe0, 0x5b, 0x11, 0xc1, 0x08, 0xbc, 0xce, 0xcf, 0x26, 0xdd, 0x5a, 0xe0, 0xd8, 0x47, 0xca, 0xe0,
+	0xdc, 0x0b, 0x53, 0x2d, 0x94, 0x74, 0x62, 0x17, 0x11, 0x12, 0xa9, 0x0d, 0x92, 0xcf, 0x7c, 0xf4,
+	0x8f, 0x66, 0xe6, 0xc3, 0x82, 0x6b, 0xdf, 0xaa, 0xa2, 0x4a, 0x45, 0x67, 0xf9, 0x42, 0xfe, 0x96,
+	0xdf, 0xfc, 0x4f, 0xf9, 0x55, 0x54, 0x95, 0x7f, 0x8f, 0xd2, 0x0c, 0xa3, 0xc6, 0xb5, 0xb5, 0x6d,
+	0x17, 0x4a, 0xb6, 0xab, 0x23, 0xba, 0x59, 0x96, 0x32, 0x83, 0x6e, 0xc0, 0x59, 0xea, 0x86, 0x3a,
+	0x7f, 0xe2, 0xdb, 0xaf, 0x1a, 0x76, 0xf9, 0x9b, 0xdd, 0xa7, 0x2d, 0x8d, 0x6e, 0x82, 0xda, 0x99,
+	0x0a, 0x0c, 0xf2, 0x97, 0x2a, 0xb3, 0x69, 0x21, 0x1e, 0x0b, 0x0c, 0x06, 0x9b, 0x74, 0x3d, 0x72,
+	0xd1, 0x0b, 0xfa, 0x9f, 0x09, 0xdd, 0xa9, 0x0f, 0xcb, 0x2e, 0x08, 0xbd, 0x79, 0x08, 0xb8, 0xa4,
+	0x3d, 0xfd, 0xd3, 0x3f, 0x9e, 0x7f, 0x36, 0x9d, 0x67, 0x7f, 0xb7, 0xb7, 0xc1, 0x17, 0xf2, 0x75,
+	0x66, 0x92, 0xcb, 0x99, 0x49, 0x7e, 0xcc, 0x4c, 0x72, 0x31, 0x37, 0x1b, 0x97, 0x73, 0xb3, 0xf1,
+	0x7d, 0x6e, 0x36, 0xe8, 0x43, 0xa1, 0xae, 0x0d, 0x1f, 0x18, 0x75, 0xfa, 0xa8, 0xb8, 0x4b, 0x86,
+	0x59, 0xf9, 0x90, 0xbc, 0x7b, 0xee, 0x0b, 0x0c, 0xd2, 0x13, 0xee, 0xa9, 0xc8, 0x1a, 0x47, 0x2e,
+	0x06, 0x02, 0x52, 0x6b, 0x89, 0xbc, 0x97, 0x93, 0xf7, 0xfc, 0xd5, 0x57, 0xd5, 0xc9, 0x46, 0x6e,
+	0x3f, 0xfa, 0x15, 0x00, 0x00, 0xff, 0xff, 0x26, 0xb5, 0x42, 0x08, 0xdd, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -421,3 +450,916 @@ var _MetricConfig_serviceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "opentelemetry/proto/metrics/experimental/metrics_config_service.proto",
 }
+
+func (m *MetricConfigRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MetricConfigRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MetricConfigRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.LastKnownFingerprint) > 0 {
+		i -= len(m.LastKnownFingerprint)
+		copy(dAtA[i:], m.LastKnownFingerprint)
+		i = encodeVarintMetricsConfigService(dAtA, i, uint64(len(m.LastKnownFingerprint)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Resource != nil {
+		{
+			size, err := m.Resource.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMetricsConfigService(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MetricConfigResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MetricConfigResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MetricConfigResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.SuggestedWaitTimeSec != 0 {
+		i = encodeVarintMetricsConfigService(dAtA, i, uint64(m.SuggestedWaitTimeSec))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.Schedules) > 0 {
+		for iNdEx := len(m.Schedules) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Schedules[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMetricsConfigService(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Fingerprint) > 0 {
+		i -= len(m.Fingerprint)
+		copy(dAtA[i:], m.Fingerprint)
+		i = encodeVarintMetricsConfigService(dAtA, i, uint64(len(m.Fingerprint)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MetricConfigResponse_Schedule) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MetricConfigResponse_Schedule) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MetricConfigResponse_Schedule) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.PeriodSec != 0 {
+		i = encodeVarintMetricsConfigService(dAtA, i, uint64(m.PeriodSec))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.InclusionPatterns) > 0 {
+		for iNdEx := len(m.InclusionPatterns) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.InclusionPatterns[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMetricsConfigService(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.ExclusionPatterns) > 0 {
+		for iNdEx := len(m.ExclusionPatterns) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ExclusionPatterns[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMetricsConfigService(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MetricConfigResponse_Schedule_Pattern) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MetricConfigResponse_Schedule_Pattern) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MetricConfigResponse_Schedule_Pattern) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Match != nil {
+		{
+			size := m.Match.Size()
+			i -= size
+			if _, err := m.Match.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MetricConfigResponse_Schedule_Pattern_Equals) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MetricConfigResponse_Schedule_Pattern_Equals) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.Equals)
+	copy(dAtA[i:], m.Equals)
+	i = encodeVarintMetricsConfigService(dAtA, i, uint64(len(m.Equals)))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+func (m *MetricConfigResponse_Schedule_Pattern_StartsWith) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MetricConfigResponse_Schedule_Pattern_StartsWith) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.StartsWith)
+	copy(dAtA[i:], m.StartsWith)
+	i = encodeVarintMetricsConfigService(dAtA, i, uint64(len(m.StartsWith)))
+	i--
+	dAtA[i] = 0x12
+	return len(dAtA) - i, nil
+}
+func encodeVarintMetricsConfigService(dAtA []byte, offset int, v uint64) int {
+	offset -= sovMetricsConfigService(v)
+	base := offset
+	for v >= 1<<7 {
+		dAtA[offset] = uint8(v&0x7f | 0x80)
+		v >>= 7
+		offset++
+	}
+	dAtA[offset] = uint8(v)
+	return base
+}
+func (m *MetricConfigRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Resource != nil {
+		l = m.Resource.Size()
+		n += 1 + l + sovMetricsConfigService(uint64(l))
+	}
+	l = len(m.LastKnownFingerprint)
+	if l > 0 {
+		n += 1 + l + sovMetricsConfigService(uint64(l))
+	}
+	return n
+}
+
+func (m *MetricConfigResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Fingerprint)
+	if l > 0 {
+		n += 1 + l + sovMetricsConfigService(uint64(l))
+	}
+	if len(m.Schedules) > 0 {
+		for _, e := range m.Schedules {
+			l = e.Size()
+			n += 1 + l + sovMetricsConfigService(uint64(l))
+		}
+	}
+	if m.SuggestedWaitTimeSec != 0 {
+		n += 1 + sovMetricsConfigService(uint64(m.SuggestedWaitTimeSec))
+	}
+	return n
+}
+
+func (m *MetricConfigResponse_Schedule) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.ExclusionPatterns) > 0 {
+		for _, e := range m.ExclusionPatterns {
+			l = e.Size()
+			n += 1 + l + sovMetricsConfigService(uint64(l))
+		}
+	}
+	if len(m.InclusionPatterns) > 0 {
+		for _, e := range m.InclusionPatterns {
+			l = e.Size()
+			n += 1 + l + sovMetricsConfigService(uint64(l))
+		}
+	}
+	if m.PeriodSec != 0 {
+		n += 1 + sovMetricsConfigService(uint64(m.PeriodSec))
+	}
+	return n
+}
+
+func (m *MetricConfigResponse_Schedule_Pattern) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Match != nil {
+		n += m.Match.Size()
+	}
+	return n
+}
+
+func (m *MetricConfigResponse_Schedule_Pattern_Equals) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Equals)
+	n += 1 + l + sovMetricsConfigService(uint64(l))
+	return n
+}
+func (m *MetricConfigResponse_Schedule_Pattern_StartsWith) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.StartsWith)
+	n += 1 + l + sovMetricsConfigService(uint64(l))
+	return n
+}
+
+func sovMetricsConfigService(x uint64) (n int) {
+	return (math_bits.Len64(x|1) + 6) / 7
+}
+func sozMetricsConfigService(x uint64) (n int) {
+	return sovMetricsConfigService(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *MetricConfigRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMetricsConfigService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MetricConfigRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MetricConfigRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Resource == nil {
+				m.Resource = &v1.Resource{}
+			}
+			if err := m.Resource.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastKnownFingerprint", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LastKnownFingerprint = append(m.LastKnownFingerprint[:0], dAtA[iNdEx:postIndex]...)
+			if m.LastKnownFingerprint == nil {
+				m.LastKnownFingerprint = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMetricsConfigService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MetricConfigResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMetricsConfigService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MetricConfigResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MetricConfigResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Fingerprint", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Fingerprint = append(m.Fingerprint[:0], dAtA[iNdEx:postIndex]...)
+			if m.Fingerprint == nil {
+				m.Fingerprint = []byte{}
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Schedules", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Schedules = append(m.Schedules, &MetricConfigResponse_Schedule{})
+			if err := m.Schedules[len(m.Schedules)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SuggestedWaitTimeSec", wireType)
+			}
+			m.SuggestedWaitTimeSec = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SuggestedWaitTimeSec |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMetricsConfigService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MetricConfigResponse_Schedule) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMetricsConfigService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Schedule: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Schedule: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ExclusionPatterns", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ExclusionPatterns = append(m.ExclusionPatterns, &MetricConfigResponse_Schedule_Pattern{})
+			if err := m.ExclusionPatterns[len(m.ExclusionPatterns)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InclusionPatterns", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.InclusionPatterns = append(m.InclusionPatterns, &MetricConfigResponse_Schedule_Pattern{})
+			if err := m.InclusionPatterns[len(m.InclusionPatterns)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PeriodSec", wireType)
+			}
+			m.PeriodSec = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PeriodSec |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMetricsConfigService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MetricConfigResponse_Schedule_Pattern) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMetricsConfigService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Pattern: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Pattern: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Equals", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Match = &MetricConfigResponse_Schedule_Pattern_Equals{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartsWith", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Match = &MetricConfigResponse_Schedule_Pattern_StartsWith{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMetricsConfigService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthMetricsConfigService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func skipMetricsConfigService(dAtA []byte) (n int, err error) {
+	l := len(dAtA)
+	iNdEx := 0
+	depth := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return 0, ErrIntOverflowMetricsConfigService
+			}
+			if iNdEx >= l {
+				return 0, io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		wireType := int(wire & 0x7)
+		switch wireType {
+		case 0:
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				iNdEx++
+				if dAtA[iNdEx-1] < 0x80 {
+					break
+				}
+			}
+		case 1:
+			iNdEx += 8
+		case 2:
+			var length int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowMetricsConfigService
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				length |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if length < 0 {
+				return 0, ErrInvalidLengthMetricsConfigService
+			}
+			iNdEx += length
+		case 3:
+			depth++
+		case 4:
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupMetricsConfigService
+			}
+			depth--
+		case 5:
+			iNdEx += 4
+		default:
+			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
+		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthMetricsConfigService
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
+	}
+	return 0, io.ErrUnexpectedEOF
+}
+
+var (
+	ErrInvalidLengthMetricsConfigService        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowMetricsConfigService          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupMetricsConfigService = fmt.Errorf("proto: unexpected end of group")
+)

@@ -4,9 +4,12 @@
 package v1
 
 import (
+	encoding_binary "encoding/binary"
 	fmt "fmt"
 	proto "github.com/gogo/protobuf/proto"
+	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -71,10 +74,7 @@ type TraceConfig struct {
 	// The global default max number of link entries per span.
 	MaxNumberOfLinks int64 `protobuf:"varint,7,opt,name=max_number_of_links,json=maxNumberOfLinks,proto3" json:"max_number_of_links,omitempty"`
 	// The global default max number of attributes per span.
-	MaxNumberOfAttributesPerLink int64    `protobuf:"varint,8,opt,name=max_number_of_attributes_per_link,json=maxNumberOfAttributesPerLink,proto3" json:"max_number_of_attributes_per_link,omitempty"`
-	XXX_NoUnkeyedLiteral         struct{} `json:"-"`
-	XXX_unrecognized             []byte   `json:"-"`
-	XXX_sizecache                int32    `json:"-"`
+	MaxNumberOfAttributesPerLink int64 `protobuf:"varint,8,opt,name=max_number_of_attributes_per_link,json=maxNumberOfAttributesPerLink,proto3" json:"max_number_of_attributes_per_link,omitempty"`
 }
 
 func (m *TraceConfig) Reset()         { *m = TraceConfig{} }
@@ -84,16 +84,25 @@ func (*TraceConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5936aa8fa6443e6f, []int{0}
 }
 func (m *TraceConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_TraceConfig.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *TraceConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_TraceConfig.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_TraceConfig.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *TraceConfig) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_TraceConfig.Merge(m, src)
 }
 func (m *TraceConfig) XXX_Size() int {
-	return xxx_messageInfo_TraceConfig.Size(m)
+	return m.Size()
 }
 func (m *TraceConfig) XXX_DiscardUnknown() {
 	xxx_messageInfo_TraceConfig.DiscardUnknown(m)
@@ -103,6 +112,8 @@ var xxx_messageInfo_TraceConfig proto.InternalMessageInfo
 
 type isTraceConfig_Sampler interface {
 	isTraceConfig_Sampler()
+	MarshalTo([]byte) (int, error)
+	Size() int
 }
 
 type TraceConfig_ConstantSampler struct {
@@ -193,10 +204,7 @@ func (*TraceConfig) XXX_OneofWrappers() []interface{} {
 
 // Sampler that always makes a constant decision on span sampling.
 type ConstantSampler struct {
-	Decision             ConstantSampler_ConstantDecision `protobuf:"varint,1,opt,name=decision,proto3,enum=opentelemetry.proto.trace.v1.ConstantSampler_ConstantDecision" json:"decision,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
-	XXX_unrecognized     []byte                           `json:"-"`
-	XXX_sizecache        int32                            `json:"-"`
+	Decision ConstantSampler_ConstantDecision `protobuf:"varint,1,opt,name=decision,proto3,enum=opentelemetry.proto.trace.v1.ConstantSampler_ConstantDecision" json:"decision,omitempty"`
 }
 
 func (m *ConstantSampler) Reset()         { *m = ConstantSampler{} }
@@ -206,16 +214,25 @@ func (*ConstantSampler) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5936aa8fa6443e6f, []int{1}
 }
 func (m *ConstantSampler) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ConstantSampler.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *ConstantSampler) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ConstantSampler.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_ConstantSampler.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *ConstantSampler) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ConstantSampler.Merge(m, src)
 }
 func (m *ConstantSampler) XXX_Size() int {
-	return xxx_messageInfo_ConstantSampler.Size(m)
+	return m.Size()
 }
 func (m *ConstantSampler) XXX_DiscardUnknown() {
 	xxx_messageInfo_ConstantSampler.DiscardUnknown(m)
@@ -234,10 +251,7 @@ func (m *ConstantSampler) GetDecision() ConstantSampler_ConstantDecision {
 // The ratio of sampling a trace is equal to that of the specified ratio.
 type TraceIdRatioBased struct {
 	// The desired ratio of sampling. Must be within [0.0, 1.0].
-	SamplingRatio        float64  `protobuf:"fixed64,1,opt,name=samplingRatio,proto3" json:"samplingRatio,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	SamplingRatio float64 `protobuf:"fixed64,1,opt,name=samplingRatio,proto3" json:"samplingRatio,omitempty"`
 }
 
 func (m *TraceIdRatioBased) Reset()         { *m = TraceIdRatioBased{} }
@@ -247,16 +261,25 @@ func (*TraceIdRatioBased) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5936aa8fa6443e6f, []int{2}
 }
 func (m *TraceIdRatioBased) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_TraceIdRatioBased.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *TraceIdRatioBased) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_TraceIdRatioBased.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_TraceIdRatioBased.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *TraceIdRatioBased) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_TraceIdRatioBased.Merge(m, src)
 }
 func (m *TraceIdRatioBased) XXX_Size() int {
-	return xxx_messageInfo_TraceIdRatioBased.Size(m)
+	return m.Size()
 }
 func (m *TraceIdRatioBased) XXX_DiscardUnknown() {
 	xxx_messageInfo_TraceIdRatioBased.DiscardUnknown(m)
@@ -274,10 +297,7 @@ func (m *TraceIdRatioBased) GetSamplingRatio() float64 {
 // Sampler that tries to sample with a rate per time window.
 type RateLimitingSampler struct {
 	// Rate per second.
-	Qps                  int64    `protobuf:"varint,1,opt,name=qps,proto3" json:"qps,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Qps int64 `protobuf:"varint,1,opt,name=qps,proto3" json:"qps,omitempty"`
 }
 
 func (m *RateLimitingSampler) Reset()         { *m = RateLimitingSampler{} }
@@ -287,16 +307,25 @@ func (*RateLimitingSampler) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5936aa8fa6443e6f, []int{3}
 }
 func (m *RateLimitingSampler) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RateLimitingSampler.Unmarshal(m, b)
+	return m.Unmarshal(b)
 }
 func (m *RateLimitingSampler) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RateLimitingSampler.Marshal(b, m, deterministic)
+	if deterministic {
+		return xxx_messageInfo_RateLimitingSampler.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
 }
 func (m *RateLimitingSampler) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RateLimitingSampler.Merge(m, src)
 }
 func (m *RateLimitingSampler) XXX_Size() int {
-	return xxx_messageInfo_RateLimitingSampler.Size(m)
+	return m.Size()
 }
 func (m *RateLimitingSampler) XXX_DiscardUnknown() {
 	xxx_messageInfo_RateLimitingSampler.DiscardUnknown(m)
@@ -324,38 +353,895 @@ func init() {
 }
 
 var fileDescriptor_5936aa8fa6443e6f = []byte{
-	// 516 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0x4f, 0x6b, 0xdb, 0x40,
-	0x10, 0xc5, 0xa3, 0xb8, 0xf9, 0x37, 0xc1, 0x89, 0xbc, 0x6e, 0x8a, 0x28, 0x81, 0xa6, 0xa2, 0x50,
-	0x5f, 0x2c, 0xe1, 0xf4, 0x50, 0x5a, 0x68, 0xc1, 0xce, 0x9f, 0xa6, 0x60, 0x1c, 0xa3, 0x18, 0x4a,
-	0x7d, 0x59, 0x56, 0xd2, 0x5a, 0x59, 0x2a, 0xed, 0xba, 0xab, 0xb1, 0x49, 0xef, 0xfd, 0x46, 0xfd,
-	0x82, 0x45, 0x6b, 0xd7, 0xb1, 0x9c, 0xc4, 0xd0, 0x9b, 0xe6, 0x3d, 0xbf, 0xdf, 0xcc, 0xe0, 0x91,
-	0xc0, 0x57, 0x63, 0x2e, 0x91, 0xa7, 0x3c, 0xe3, 0xa8, 0x7f, 0xf9, 0x63, 0xad, 0x50, 0xf9, 0xa8,
-	0x59, 0xc4, 0xfd, 0x69, 0x6b, 0xf6, 0x40, 0x23, 0x25, 0x47, 0x22, 0xf1, 0x8c, 0x47, 0x8e, 0x4b,
-	0x81, 0x99, 0xe8, 0x99, 0xdf, 0x79, 0xd3, 0x96, 0xfb, 0x7b, 0x0b, 0xf6, 0x07, 0x45, 0x71, 0x66,
-	0x32, 0x64, 0x08, 0x76, 0xa4, 0x64, 0x8e, 0x4c, 0x22, 0xcd, 0x59, 0x36, 0x4e, 0xb9, 0x76, 0xac,
-	0x13, 0xab, 0xb1, 0x7f, 0xda, 0xf4, 0xd6, 0x81, 0xbc, 0xb3, 0x79, 0xea, 0x66, 0x16, 0xba, 0xda,
-	0x08, 0x0e, 0xa3, 0xb2, 0x44, 0x42, 0x78, 0x3e, 0x9b, 0x4f, 0xc4, 0x54, 0x33, 0x14, 0x8a, 0x86,
-	0x2c, 0xe7, 0xb1, 0xb3, 0x69, 0xf8, 0xfe, 0x7a, 0xbe, 0x19, 0xf2, 0x6b, 0x1c, 0x14, 0xb9, 0x4e,
-	0x11, 0xbb, 0xda, 0x08, 0x6a, 0xb8, 0x2a, 0x92, 0x04, 0x8e, 0x34, 0x43, 0x4e, 0x53, 0x91, 0x09,
-	0x14, 0x32, 0x59, 0x2c, 0x51, 0x31, 0x4d, 0x5a, 0xeb, 0x9b, 0x04, 0x0c, 0x79, 0x77, 0x9e, 0xbc,
-	0x5f, 0xa4, 0xae, 0x1f, 0xca, 0xe4, 0x3d, 0x38, 0x19, 0xbb, 0xa3, 0x72, 0x92, 0x85, 0x5c, 0x53,
-	0x35, 0xa2, 0x0c, 0x51, 0x8b, 0x70, 0x82, 0x3c, 0x77, 0x9e, 0x9d, 0x58, 0x8d, 0x4a, 0x70, 0x94,
-	0xb1, 0xbb, 0x9e, 0xb1, 0xaf, 0x47, 0xed, 0x85, 0x49, 0x3e, 0xc2, 0xcb, 0x72, 0x10, 0x45, 0xc6,
-	0x63, 0xca, 0xa7, 0x5c, 0x62, 0xee, 0x6c, 0x99, 0xe8, 0x8b, 0xa5, 0xe8, 0xa0, 0xb0, 0x2f, 0x8c,
-	0x4b, 0x06, 0xd0, 0x78, 0xaa, 0x29, 0x1d, 0x73, 0xbd, 0x8c, 0x72, 0xb6, 0x0d, 0xc9, 0x7d, 0x74,
-	0x88, 0x3e, 0xd7, 0xf7, 0x58, 0xd2, 0x84, 0x7a, 0x99, 0x9a, 0x0a, 0xf9, 0x23, 0x77, 0x76, 0x0c,
-	0xc0, 0x5e, 0x02, 0x74, 0x0b, 0x9d, 0x7c, 0x81, 0xd7, 0x6b, 0x87, 0x28, 0xd2, 0xce, 0xae, 0x09,
-	0x1f, 0x3f, 0xd5, 0xbd, 0x20, 0x75, 0xf6, 0x60, 0x67, 0xfe, 0xef, 0xb8, 0x7f, 0x2c, 0x38, 0x5c,
-	0xb9, 0x20, 0x32, 0x84, 0xdd, 0x98, 0x47, 0x22, 0x17, 0x4a, 0x9a, 0x13, 0x3c, 0x38, 0xfd, 0xfc,
-	0x5f, 0x27, 0xb8, 0xa8, 0xcf, 0xe7, 0x94, 0x60, 0xc1, 0x73, 0xcf, 0xc1, 0x5e, 0x75, 0xc9, 0x01,
-	0x40, 0xbb, 0xfb, 0xad, 0xfd, 0xfd, 0x86, 0x5e, 0x5f, 0x5e, 0xda, 0x1b, 0xa4, 0x0a, 0x7b, 0xff,
-	0xea, 0x9e, 0x6d, 0x91, 0x1a, 0x54, 0xe7, 0x65, 0xbf, 0x1d, 0x5c, 0xf4, 0x06, 0xf6, 0xa6, 0xfb,
-	0x01, 0x6a, 0x0f, 0xce, 0x92, 0xbc, 0x81, 0xaa, 0xd9, 0x4a, 0xc8, 0xc4, 0xa8, 0x66, 0x76, 0x2b,
-	0x28, 0x8b, 0xee, 0x5b, 0xa8, 0x3f, 0x72, 0x6c, 0xc4, 0x86, 0xca, 0xcf, 0x71, 0x6e, 0x22, 0x95,
-	0xa0, 0x78, 0xec, 0x20, 0xbc, 0x12, 0x6a, 0xed, 0xde, 0x1d, 0x7b, 0xe9, 0x05, 0xee, 0x17, 0x56,
-	0xdf, 0x1a, 0x7e, 0x4a, 0x04, 0xde, 0x4e, 0x42, 0x2f, 0x52, 0x99, 0x1f, 0x67, 0x0c, 0x6f, 0x05,
-	0x9f, 0x94, 0x3f, 0x1d, 0x4d, 0x43, 0x69, 0x26, 0xca, 0x8f, 0x54, 0x9a, 0xf2, 0x08, 0x95, 0x5e,
-	0x7c, 0x47, 0xc2, 0x6d, 0x63, 0xbe, 0xfb, 0x1b, 0x00, 0x00, 0xff, 0xff, 0x3d, 0xc1, 0x34, 0xcd,
-	0x6e, 0x04, 0x00, 0x00,
+	// 553 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xcd, 0x6e, 0xd3, 0x4e,
+	0x14, 0xc5, 0xed, 0xe6, 0xdf, 0xaf, 0x5b, 0xb5, 0x75, 0x27, 0xff, 0x22, 0x0b, 0x55, 0xa6, 0x58,
+	0x48, 0x64, 0x13, 0x5b, 0x29, 0x0b, 0x04, 0x12, 0x48, 0x49, 0x3f, 0x28, 0x52, 0x94, 0x46, 0x6e,
+	0x24, 0x44, 0x36, 0xa3, 0xb1, 0x3d, 0x71, 0x47, 0xd8, 0x9e, 0x30, 0x9e, 0x44, 0x65, 0xcf, 0x92,
+	0x05, 0xef, 0xc2, 0x4b, 0xb0, 0xec, 0x92, 0x25, 0x4a, 0x5e, 0x04, 0x79, 0x12, 0xd2, 0x38, 0x6d,
+	0x23, 0xb1, 0x9b, 0x7b, 0x4e, 0xce, 0xef, 0xde, 0x49, 0x6e, 0x06, 0x5c, 0xde, 0xa7, 0xa9, 0xa4,
+	0x31, 0x4d, 0xa8, 0x14, 0x5f, 0xdc, 0xbe, 0xe0, 0x92, 0xbb, 0x52, 0x90, 0x80, 0xba, 0xc3, 0xda,
+	0xe4, 0x80, 0x03, 0x9e, 0xf6, 0x58, 0xe4, 0x28, 0x0f, 0x1d, 0x14, 0x02, 0x13, 0xd1, 0x51, 0x9f,
+	0x73, 0x86, 0x35, 0xfb, 0xeb, 0x2a, 0x6c, 0x75, 0xf2, 0xe2, 0x58, 0x65, 0x50, 0x17, 0x8c, 0x80,
+	0xa7, 0x99, 0x24, 0xa9, 0xc4, 0x19, 0x49, 0xfa, 0x31, 0x15, 0xa6, 0x7e, 0xa8, 0x57, 0xb6, 0x8e,
+	0xaa, 0xce, 0x32, 0x90, 0x73, 0x3c, 0x4d, 0x5d, 0x4e, 0x42, 0xe7, 0x9a, 0xb7, 0x1b, 0x14, 0x25,
+	0xe4, 0xc3, 0xff, 0x93, 0xf9, 0x58, 0x88, 0x05, 0x91, 0x8c, 0x63, 0x9f, 0x64, 0x34, 0x34, 0x57,
+	0x14, 0xdf, 0x5d, 0xce, 0x57, 0x43, 0xbe, 0x0f, 0xbd, 0x3c, 0xd7, 0xc8, 0x63, 0xe7, 0x9a, 0xb7,
+	0x27, 0x17, 0x45, 0x14, 0xc1, 0xbe, 0x20, 0x92, 0xe2, 0x98, 0x25, 0x4c, 0xb2, 0x34, 0x9a, 0x5d,
+	0xa2, 0xa4, 0x9a, 0xd4, 0x96, 0x37, 0xf1, 0x88, 0xa4, 0xcd, 0x69, 0xf2, 0xf6, 0x22, 0x65, 0x71,
+	0x57, 0x46, 0x2f, 0xc1, 0x4c, 0xc8, 0x35, 0x4e, 0x07, 0x89, 0x4f, 0x05, 0xe6, 0x3d, 0x4c, 0xa4,
+	0x14, 0xcc, 0x1f, 0x48, 0x9a, 0x99, 0xff, 0x1d, 0xea, 0x95, 0x92, 0xb7, 0x9f, 0x90, 0xeb, 0x96,
+	0xb2, 0x2f, 0x7a, 0xf5, 0x99, 0x89, 0x5e, 0xc3, 0xe3, 0x62, 0x50, 0xb2, 0x84, 0x86, 0x98, 0x0e,
+	0x69, 0x2a, 0x33, 0x73, 0x55, 0x45, 0x1f, 0xcd, 0x45, 0x3b, 0xb9, 0x7d, 0xaa, 0x5c, 0xd4, 0x81,
+	0xca, 0x43, 0x4d, 0x71, 0x9f, 0x8a, 0x79, 0x94, 0xb9, 0xa6, 0x48, 0xf6, 0xbd, 0x43, 0xb4, 0xa9,
+	0xb8, 0xc5, 0xa2, 0x2a, 0x94, 0x8b, 0xd4, 0x98, 0xa5, 0x9f, 0x32, 0x73, 0x5d, 0x01, 0x8c, 0x39,
+	0x40, 0x33, 0xd7, 0xd1, 0x3b, 0x78, 0xba, 0x74, 0x88, 0x3c, 0x6d, 0x6e, 0xa8, 0xf0, 0xc1, 0x43,
+	0xdd, 0x73, 0x52, 0x63, 0x13, 0xd6, 0xa7, 0xbf, 0x8e, 0xfd, 0x43, 0x87, 0xdd, 0x85, 0x0d, 0x42,
+	0x5d, 0xd8, 0x08, 0x69, 0xc0, 0x32, 0xc6, 0x53, 0xb5, 0x82, 0x3b, 0x47, 0x6f, 0xff, 0x69, 0x05,
+	0x67, 0xf5, 0xc9, 0x94, 0xe2, 0xcd, 0x78, 0xf6, 0x09, 0x18, 0x8b, 0x2e, 0xda, 0x01, 0xa8, 0x37,
+	0x3f, 0xd4, 0x3f, 0x5e, 0xe2, 0x8b, 0xb3, 0x33, 0x43, 0x43, 0xdb, 0xb0, 0xf9, 0xb7, 0x6e, 0x19,
+	0x3a, 0xda, 0x83, 0xed, 0x69, 0xd9, 0xae, 0x7b, 0xa7, 0xad, 0x8e, 0xb1, 0x62, 0xbf, 0x82, 0xbd,
+	0x3b, 0x6b, 0x89, 0x9e, 0xc1, 0xb6, 0xba, 0x15, 0x4b, 0x23, 0xa5, 0xaa, 0xd9, 0x75, 0xaf, 0x28,
+	0xda, 0xcf, 0xa1, 0x7c, 0xcf, 0xb2, 0x21, 0x03, 0x4a, 0x9f, 0xfb, 0x99, 0x8a, 0x94, 0xbc, 0xfc,
+	0xd8, 0xf8, 0xa6, 0xff, 0x1c, 0x59, 0xfa, 0xcd, 0xc8, 0xd2, 0x7f, 0x8f, 0x2c, 0xfd, 0xfb, 0xd8,
+	0xd2, 0x6e, 0xc6, 0x96, 0xf6, 0x6b, 0x6c, 0x69, 0xf0, 0x84, 0xf1, 0xa5, 0x5f, 0x48, 0xc3, 0x98,
+	0xfb, 0x67, 0xb7, 0x73, 0xab, 0xad, 0x77, 0xdf, 0x44, 0x4c, 0x5e, 0x0d, 0x7c, 0x27, 0xe0, 0x89,
+	0x1b, 0x26, 0x44, 0x5e, 0x31, 0x3a, 0x28, 0xbe, 0x29, 0x55, 0x45, 0xa9, 0x46, 0xdc, 0x0d, 0x78,
+	0x1c, 0xd3, 0x40, 0x72, 0x31, 0x7b, 0x60, 0xfc, 0x35, 0x65, 0xbe, 0xf8, 0x13, 0x00, 0x00, 0xff,
+	0xff, 0xb6, 0xa0, 0x0e, 0x86, 0x87, 0x04, 0x00, 0x00,
 }
+
+func (m *TraceConfig) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *TraceConfig) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TraceConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.MaxNumberOfAttributesPerLink != 0 {
+		i = encodeVarintTraceConfig(dAtA, i, uint64(m.MaxNumberOfAttributesPerLink))
+		i--
+		dAtA[i] = 0x40
+	}
+	if m.MaxNumberOfLinks != 0 {
+		i = encodeVarintTraceConfig(dAtA, i, uint64(m.MaxNumberOfLinks))
+		i--
+		dAtA[i] = 0x38
+	}
+	if m.MaxNumberOfAttributesPerTimedEvent != 0 {
+		i = encodeVarintTraceConfig(dAtA, i, uint64(m.MaxNumberOfAttributesPerTimedEvent))
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.MaxNumberOfTimedEvents != 0 {
+		i = encodeVarintTraceConfig(dAtA, i, uint64(m.MaxNumberOfTimedEvents))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.MaxNumberOfAttributes != 0 {
+		i = encodeVarintTraceConfig(dAtA, i, uint64(m.MaxNumberOfAttributes))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Sampler != nil {
+		{
+			size := m.Sampler.Size()
+			i -= size
+			if _, err := m.Sampler.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *TraceConfig_ConstantSampler) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TraceConfig_ConstantSampler) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.ConstantSampler != nil {
+		{
+			size, err := m.ConstantSampler.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTraceConfig(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TraceConfig_TraceIdRatioBased) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TraceConfig_TraceIdRatioBased) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.TraceIdRatioBased != nil {
+		{
+			size, err := m.TraceIdRatioBased.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTraceConfig(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TraceConfig_RateLimitingSampler) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TraceConfig_RateLimitingSampler) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.RateLimitingSampler != nil {
+		{
+			size, err := m.RateLimitingSampler.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTraceConfig(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ConstantSampler) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ConstantSampler) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ConstantSampler) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Decision != 0 {
+		i = encodeVarintTraceConfig(dAtA, i, uint64(m.Decision))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *TraceIdRatioBased) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *TraceIdRatioBased) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TraceIdRatioBased) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.SamplingRatio != 0 {
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.SamplingRatio))))
+		i--
+		dAtA[i] = 0x9
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RateLimitingSampler) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RateLimitingSampler) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RateLimitingSampler) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Qps != 0 {
+		i = encodeVarintTraceConfig(dAtA, i, uint64(m.Qps))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func encodeVarintTraceConfig(dAtA []byte, offset int, v uint64) int {
+	offset -= sovTraceConfig(v)
+	base := offset
+	for v >= 1<<7 {
+		dAtA[offset] = uint8(v&0x7f | 0x80)
+		v >>= 7
+		offset++
+	}
+	dAtA[offset] = uint8(v)
+	return base
+}
+func (m *TraceConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Sampler != nil {
+		n += m.Sampler.Size()
+	}
+	if m.MaxNumberOfAttributes != 0 {
+		n += 1 + sovTraceConfig(uint64(m.MaxNumberOfAttributes))
+	}
+	if m.MaxNumberOfTimedEvents != 0 {
+		n += 1 + sovTraceConfig(uint64(m.MaxNumberOfTimedEvents))
+	}
+	if m.MaxNumberOfAttributesPerTimedEvent != 0 {
+		n += 1 + sovTraceConfig(uint64(m.MaxNumberOfAttributesPerTimedEvent))
+	}
+	if m.MaxNumberOfLinks != 0 {
+		n += 1 + sovTraceConfig(uint64(m.MaxNumberOfLinks))
+	}
+	if m.MaxNumberOfAttributesPerLink != 0 {
+		n += 1 + sovTraceConfig(uint64(m.MaxNumberOfAttributesPerLink))
+	}
+	return n
+}
+
+func (m *TraceConfig_ConstantSampler) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ConstantSampler != nil {
+		l = m.ConstantSampler.Size()
+		n += 1 + l + sovTraceConfig(uint64(l))
+	}
+	return n
+}
+func (m *TraceConfig_TraceIdRatioBased) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.TraceIdRatioBased != nil {
+		l = m.TraceIdRatioBased.Size()
+		n += 1 + l + sovTraceConfig(uint64(l))
+	}
+	return n
+}
+func (m *TraceConfig_RateLimitingSampler) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RateLimitingSampler != nil {
+		l = m.RateLimitingSampler.Size()
+		n += 1 + l + sovTraceConfig(uint64(l))
+	}
+	return n
+}
+func (m *ConstantSampler) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Decision != 0 {
+		n += 1 + sovTraceConfig(uint64(m.Decision))
+	}
+	return n
+}
+
+func (m *TraceIdRatioBased) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.SamplingRatio != 0 {
+		n += 9
+	}
+	return n
+}
+
+func (m *RateLimitingSampler) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Qps != 0 {
+		n += 1 + sovTraceConfig(uint64(m.Qps))
+	}
+	return n
+}
+
+func sovTraceConfig(x uint64) (n int) {
+	return (math_bits.Len64(x|1) + 6) / 7
+}
+func sozTraceConfig(x uint64) (n int) {
+	return sovTraceConfig(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *TraceConfig) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTraceConfig
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: TraceConfig: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: TraceConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConstantSampler", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ConstantSampler{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Sampler = &TraceConfig_ConstantSampler{v}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceIdRatioBased", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &TraceIdRatioBased{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Sampler = &TraceConfig_TraceIdRatioBased{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RateLimitingSampler", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &RateLimitingSampler{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Sampler = &TraceConfig_RateLimitingSampler{v}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxNumberOfAttributes", wireType)
+			}
+			m.MaxNumberOfAttributes = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxNumberOfAttributes |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxNumberOfTimedEvents", wireType)
+			}
+			m.MaxNumberOfTimedEvents = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxNumberOfTimedEvents |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxNumberOfAttributesPerTimedEvent", wireType)
+			}
+			m.MaxNumberOfAttributesPerTimedEvent = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxNumberOfAttributesPerTimedEvent |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxNumberOfLinks", wireType)
+			}
+			m.MaxNumberOfLinks = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxNumberOfLinks |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxNumberOfAttributesPerLink", wireType)
+			}
+			m.MaxNumberOfAttributesPerLink = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxNumberOfAttributesPerLink |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTraceConfig(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ConstantSampler) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTraceConfig
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ConstantSampler: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ConstantSampler: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Decision", wireType)
+			}
+			m.Decision = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Decision |= ConstantSampler_ConstantDecision(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTraceConfig(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *TraceIdRatioBased) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTraceConfig
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: TraceIdRatioBased: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: TraceIdRatioBased: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SamplingRatio", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.SamplingRatio = float64(math.Float64frombits(v))
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTraceConfig(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RateLimitingSampler) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTraceConfig
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RateLimitingSampler: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RateLimitingSampler: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Qps", wireType)
+			}
+			m.Qps = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Qps |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTraceConfig(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTraceConfig
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func skipTraceConfig(dAtA []byte) (n int, err error) {
+	l := len(dAtA)
+	iNdEx := 0
+	depth := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return 0, ErrIntOverflowTraceConfig
+			}
+			if iNdEx >= l {
+				return 0, io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		wireType := int(wire & 0x7)
+		switch wireType {
+		case 0:
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				iNdEx++
+				if dAtA[iNdEx-1] < 0x80 {
+					break
+				}
+			}
+		case 1:
+			iNdEx += 8
+		case 2:
+			var length int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowTraceConfig
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				length |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if length < 0 {
+				return 0, ErrInvalidLengthTraceConfig
+			}
+			iNdEx += length
+		case 3:
+			depth++
+		case 4:
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupTraceConfig
+			}
+			depth--
+		case 5:
+			iNdEx += 4
+		default:
+			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
+		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthTraceConfig
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
+	}
+	return 0, io.ErrUnexpectedEOF
+}
+
+var (
+	ErrInvalidLengthTraceConfig        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowTraceConfig          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupTraceConfig = fmt.Errorf("proto: unexpected end of group")
+)
