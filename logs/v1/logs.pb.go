@@ -361,6 +361,8 @@ type LogRecord struct {
 	// be a structured data composed of arrays and maps of other values. [Optional].
 	Body *v11.AnyValue `protobuf:"bytes,5,opt,name=body,proto3" json:"body,omitempty"`
 	// Additional attributes that describe the specific event occurrence. [Optional].
+	// Attribute keys MUST be unique (it is not allowed to have more than one
+	// attribute with the same key).
 	Attributes             []*v11.KeyValue `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty"`
 	DroppedAttributesCount uint32          `protobuf:"varint,7,opt,name=dropped_attributes_count,json=droppedAttributesCount,proto3" json:"dropped_attributes_count,omitempty"`
 	// Flags, a bit field. 8 least significant bits are the trace flags as

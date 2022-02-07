@@ -234,6 +234,8 @@ func (m *ArrayValue) GetValues() []*AnyValue {
 type KeyValueList struct {
 	// A collection of key/value pairs of key-value pairs. The list may be empty (may
 	// contain 0 elements).
+	// The keys MUST be unique (it is not allowed to have more than one
+	// value with the same key).
 	Values []*KeyValue `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
 }
 
